@@ -14,3 +14,10 @@ a {
 * {
   box-sizing: border-box;
 }
+
+@media (min-width: 640px) {
+  .w-fixed {
+      flex: 0 1 230px;
+      min-width: 230px;
+  }
+}
