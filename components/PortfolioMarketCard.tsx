@@ -8,7 +8,7 @@ export const PortfolioMarketCard = () => {
         <div className="flex flex-row space-x-5 pb-4">
           <div className="h-w-15">
             <Img
-              src="https://assets.bwbx.io/images/users/iqjWHBFdfxIU/isjFotcMs.PA/v1/1000x-1.jpg"
+              src={`https://ipfs.infura.io/ipfs/a`}
               className="rounded-full"
               width={55}
               height={55}

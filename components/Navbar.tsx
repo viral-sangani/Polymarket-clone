@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React from "react";
+import { useData } from "../contexts/DataContext";
 
 function Navbar() {
   const router = useRouter();
+  const { account, loadWeb3 } = useData();
 
   return (
     <>
@@ -14,8 +16,8 @@ function Navbar() {
               Polymarket
             </span>
           </Link>
-          {!router.asPath.includes("/market") ||
-            (!router.asPath.includes("/admin") && (
+          {!router.asPath.includes("/market") &&
+            !router.asPath.includes("/admin") && (
               <div className="flex flex-row items-center justify-center h-full">
                 <TabButton
                   title="Market"
@@ -28,10 +30,23 @@ function Navbar() {
                   url={"/portfolio"}
                 />
               </div>
-            ))}
-          <div className="bg-green-500 px-6 py-2 rounded-md cursor-pointer">
-            <span className="text-lg text-white">Connect</span>
-          </div>
+            )}
+          {account ? (
+            <div className="bg-green-500 px-6 py-2 rounded-md cursor-pointer">
+              <span className="text-lg text-white">
+                {account.substr(0, 10)}...
+              </span>
+            </div>
+          ) : (
+            <div
+              className="bg-green-500 px-6 py-2 rounded-md cursor-pointer"
+              onClick={() => {
+                loadWeb3();
+              }}
+            >
+              <span className="text-lg text-white">Connect</span>
+            </div>
+          )}
         </div>
       </nav>
     </>

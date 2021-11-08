@@ -1,11 +1,49 @@
 import Head from "next/head";
-import { FavIcon } from "../components/FavIcon";
+import { useCallback, useEffect, useState } from "react";
 import { Filter } from "../components/Filter";
 import { MarketCard } from "../components/MarketCard";
 import Navbar from "../components/Navbar";
+import { useData } from "../contexts/DataContext";
 import styles from "../styles/Home.module.css";
 
+export interface MarketProps {
+  id: string;
+  title: string;
+  imageHash: string;
+  totalAmount: string;
+  totalYes: string;
+  totalNo: string;
+}
+
 export default function Home() {
+  const { polymarket, account, loadWeb3, loading } = useData();
+  const [markets, setMarkets] = useState<MarketProps[]>([]);
+
+  const getMarkets = useCallback(async () => {
+    var totalQuestions = await polymarket.methods
+      .totalQuestions()
+      .call({ from: account });
+    var dataArray: MarketProps[] = [];
+    for (var i = 0; i < totalQuestions; i++) {
+      var data = await polymarket.methods.questions(i).call({ from: account });
+      dataArray.push({
+        id: data.id,
+        title: data.question,
+        imageHash: data.creatorImageHash,
+        totalAmount: data.totalAmount,
+        totalYes: data.totalYesAmount,
+        totalNo: data.totalNoAmount,
+      });
+    }
+    setMarkets(dataArray);
+  }, [account, polymarket]);
+
+  useEffect(() => {
+    loadWeb3().then(() => {
+      if (!loading) getMarkets();
+    });
+  }, [loading]);
+
   return (
     <div className={styles.container}>
       <Head>
@@ -51,17 +89,22 @@ export default function Home() {
               category="Sort By"
               onChange={() => {}}
             />
-            <div className="flex flex-row cursor-pointer mt-3 md:mt-0 space-x-2">
-              <FavIcon />
-              <span>Show Favorites</span>
-            </div>
           </div>
           <span className="font-bold my-3 text-lg">Market</span>
           <div className="flex flex-wrap overflow-hidden sm:-mx-1 md:-mx-2">
-            <MarketCard />
-            <MarketCard />
-            <MarketCard />
-            <MarketCard />
+            {markets.map((market) => {
+              return (
+                <MarketCard
+                  id={market.id}
+                  key={market.id}
+                  title={market.title}
+                  totalAmount={market.totalAmount}
+                  totalYes={market.totalYes}
+                  totalNo={market.totalNo}
+                  imageHash={market.imageHash}
+                />
+              );
+            })}
 
             <div className="my-3 px-3 w-1/3 overflow-hidden">
               {/* <!-- Column Content --> */}

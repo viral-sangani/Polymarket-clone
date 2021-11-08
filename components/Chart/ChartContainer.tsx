@@ -1,46 +1,77 @@
-import React from "react";
-import { Chart } from "react-google-charts";
+import "chartjs-adapter-moment";
+import Plotly from "plotly.js-dist-min";
+import React, { useEffect } from "react";
+import Web3 from "web3";
+import { useData } from "../../contexts/DataContext";
 
-function ChartContainer() {
+interface Props {
+  questionId: string;
+}
+
+interface ChartData {
+  time: Date[];
+  amount: number[];
+}
+
+const ChartContainer: React.FC<Props> = ({ questionId }) => {
+  const { polymarket } = useData();
+
+  const fetchGraphData = async () => {
+    var data = await polymarket.methods.getGraphData(questionId).call();
+    var yesData: ChartData = {
+      time: [],
+      amount: [],
+    };
+    var noData: ChartData = {
+      time: [],
+      amount: [],
+    };
+    data["0"].forEach((item: any) => {
+      var sum = yesData.amount.reduce((a, b) => a + b, 0);
+      yesData.amount.push(
+        sum + parseFloat(Web3.utils.fromWei(item[1], "ether"))
+      );
+      yesData.time.push(new Date(parseInt(item[2] + "000")));
+    });
+    data["1"].forEach((item: any) => {
+      var sum = noData.amount.reduce((a, b) => a + b, 0);
+      noData.amount.push(
+        sum + parseFloat(Web3.utils.fromWei(item[1], "ether"))
+      );
+      noData.time.push(new Date(parseInt(item[2] + "000")));
+    });
+
+    var yes = {
+      x: [...yesData.time],
+      y: [...yesData.amount],
+      mode: "lines+markers",
+      name: "Yes",
+    };
+
+    var no = {
+      x: [...noData.time],
+      y: [...noData.amount],
+      mode: "lines+markers",
+      name: "No",
+    };
+    var chartData = [yes, no];
+
+    var layout = {
+      title: "YES / NO Graph",
+    };
+
+    Plotly.newPlot("myDiv", chartData, layout, { displayModeBar: false });
+  };
+
+  useEffect(() => {
+    fetchGraphData();
+  });
+
   return (
     <>
-      <Chart
-        width={"100%"}
-        height={"400px"}
-        chartType="LineChart"
-        loader={<div>Please Wait</div>}
-        data={[
-          [{ type: "date", label: "Day" }, "yes", "no"],
-          // ["timestamp", ],
-          [new Date(1635825475), 0, 35],
-          [new Date(1635824475), 10, 32],
-          [new Date(1635823475), 23, 40],
-          [new Date(1635822475), 17, 33],
-          [new Date(1635821475), 18, 27],
-          [new Date(1635820475), 9, 11],
-          [new Date(1635819475), 11, 9],
-          [new Date(1635818475), 27, 18],
-          [new Date(1635817475), 33, 17],
-          [new Date(1635816475), 40, 23],
-          [new Date(1635815475), 32, 10],
-          [new Date(1635814475), 35, 0],
-        ]}
-        options={{
-          hAxis: {
-            title: "Time",
-          },
-          vAxis: {
-            title: "Amount",
-          },
-          // series: {
-          //   0: { curveType: "function" },
-          //   1: { curveType: "function" },
-          // },
-        }}
-        rootProps={{ "data-testid": "2" }}
-      />
+      <div id="myDiv"></div>
     </>
   );
-}
+};
 
 export default ChartContainer;

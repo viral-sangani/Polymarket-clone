@@ -1,27 +1,26 @@
-// const HDWalletProvider = require("@truffle/hdwallet-provider");
+const HDWalletProvider = require("@truffle/hdwallet-provider");
 const fs = require("fs");
-// const mnemonic = fs.readFileSync(".secret").toString().trim();
-// require("dotenv").config();
+const mnemonic = fs.readFileSync(".secret").toString().trim();
 
 module.exports = {
   networks: {
     development: {
       host: "localhost",
-      port: 7545,
+      port: 8545,
       network_id: "*",
     },
-    // matic: {
-    //   provider: () =>
-    //     new HDWalletProvider(
-    //       mnemonic,
-    //       `https://matic-mumbai--rpc.datahub.figment.io/apikey/${process.env.DATAHUB_POLYGON_API}}/`
-    //     ),
-    //   network_id: 80001,
-    //   confirmations: 2,
-    //   timeoutBlocks: 200,
-    //   skipDryRun: true,
-    //   chainId: 80001,
-    // },
+    matic: {
+      provider: () =>
+        new HDWalletProvider(
+          mnemonic,
+          `https://matic-mumbai.chainstacklabs.com`
+        ),
+      network_id: 80001,
+      confirmations: 2,
+      timeoutBlocks: 200,
+      skipDryRun: true,
+      chainId: 80001,
+    },
   },
   contracts_directory: "./contracts",
   contracts_build_directory: "./abis",

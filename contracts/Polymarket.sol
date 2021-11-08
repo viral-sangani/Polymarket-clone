@@ -18,6 +18,7 @@ contract Polymarket {
         uint256 id;
         string question;
         uint256 timestamp;
+        uint256 endTimestamp;
         address createdBy;
         string creatorImageHash;
         AmountAdded[] yesCount;
@@ -54,7 +55,8 @@ contract Polymarket {
         string memory _question,
         string memory _creatorImageHash,
         string memory _description,
-        string memory _resolverUrl
+        string memory _resolverUrl,
+        uint256 _endTimestamp
     ) public {
         require(msg.sender == owner, "Unauthorized");
 
@@ -72,6 +74,7 @@ contract Polymarket {
         question.totalNoAmount = 0;
         question.description = _description;
         question.resolverUrl = _resolverUrl;
+        question.endTimestamp = _endTimestamp;
 
         emit QuestionCreated(
             totalQuestions,
@@ -85,31 +88,33 @@ contract Polymarket {
         );
     }
 
-    function addYesBet(uint256 _questionId) public payable {
+    function addYesBet(uint256 _questionId, uint256 _value) public payable {
         require(_questionId == 0, "Question ID cannot be null");
         Questions storage question = questions[_questionId];
+        ERC20(polyToken).transferFrom(msg.sender, address(this), _value);
         AmountAdded memory amountAdded = AmountAdded(
             msg.sender,
-            msg.value,
+            _value,
             block.timestamp
         );
 
-        question.totalYesAmount += msg.value;
-        question.totalAmount += msg.value;
+        question.totalYesAmount += _value;
+        question.totalAmount += _value;
         question.yesCount.push(amountAdded);
     }
 
-    function addNoBet(uint256 _questionId) public payable {
+    function addNoBet(uint256 _questionId, uint256 _value) public payable {
         require(_questionId == 0, "Question ID cannot be null");
         Questions storage question = questions[_questionId];
+        ERC20(polyToken).transferFrom(msg.sender, address(this), _value);
         AmountAdded memory amountAdded = AmountAdded(
             msg.sender,
-            msg.value,
+            _value,
             block.timestamp
         );
 
-        question.totalNoAmount += msg.value;
-        question.totalAmount += msg.value;
+        question.totalNoAmount += _value;
+        question.totalAmount += _value;
         question.noCount.push(amountAdded);
     }
 
@@ -161,6 +166,16 @@ contract Polymarket {
             }
             delete winningAddresses;
         }
+        question.eventCompleted = true;
+    }
+
+    function isAdmin() public view returns (bool) {
+        if (msg.sender == owner) return true;
+        else return false;
+    }
+
+    function getBal() public view returns (uint256) {
+        return address(this).balance;
     }
 }
 
