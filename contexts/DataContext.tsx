@@ -34,11 +34,6 @@ export const useProviderData = () => {
   const [polymarket, setPolymarket] = useState<any>();
   const [polyToken, setPolyToken] = useState<any>();
 
-  // useEffect(() => {
-  // loadWeb3();
-  // loadBlockchainData();
-  // });
-
   const loadWeb3 = async () => {
     if (window.ethereum) {
       window.web3 = new Web3(window.ethereum);

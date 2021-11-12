@@ -39,11 +39,9 @@ const Portfolio = () => {
   const [openPositions, setOpenPositions] = useState<number>(0);
 
   const getMarkets = useCallback(async () => {
-    console.log("HERE");
     var totalQuestions = await polymarket.methods
       .totalQuestions()
       .call({ from: account });
-    console.log("totalQuestions :>> ", totalQuestions);
     for (var i = 0; i < totalQuestions; i++) {
       var questions = await polymarket.methods
         .questions(i)
@@ -74,7 +72,6 @@ const Portfolio = () => {
             timestamp: item[2].toString(),
           });
           totalPortValue += parseInt(item[1]);
-          console.log("item[1] :>> ", item[1]);
         }
       });
       data["1"].forEach((item: any) => {
@@ -85,12 +82,10 @@ const Portfolio = () => {
             timestamp: item[2].toString(),
           });
           totalPortValue += parseInt(item[1]);
-          console.log("item[1] :>> ", item[1]);
         }
       });
     }
     setPortfolioValue(totalPortValue);
-    console.log("totalPortValue :>> ", totalPortValue);
     for (var i = 0; i < dataArray.length; i++) {
       var question = allQuestions.find((item) => item.id == dataArray[i].id);
       dataArray[i].title = question!.title;
@@ -107,7 +102,6 @@ const Portfolio = () => {
   useEffect(() => {
     loadWeb3().then(() => {
       if (!loading) {
-        console.log("Called :>> ");
         getMarkets();
       }
     });

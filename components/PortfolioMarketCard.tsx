@@ -33,7 +33,6 @@ export const PortfolioMarketCard: React.FC<MarketProps> = ({
   var endingOn = moment(parseInt(endTimestamp));
   var now = moment(new Date()); //todays date
   var daysLeft = moment.duration(endingOn.diff(now)).asDays().toFixed(0);
-  console.log(typeof daysLeft);
   return (
     <div className="w-full overflow-hidden my-2">
       <div className="flex flex-col border border-gray-300 rounded-lg p-5 hover:border-blue-700 cursor-pointer">

@@ -32,7 +32,6 @@ const Admin = () => {
 
   const handleSubmit = async () => {
     setLoading(true);
-    console.log("timestamp :>> ", timestamp);
     await polymarket.methods
       .createQuestion(title, imageHash, description, resolverUrl, timestamp)
       .send({
