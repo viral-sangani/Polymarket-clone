@@ -6,13 +6,14 @@ contract Polymarket {
     address public owner;
     address public polyToken;
 
-    mapping(uint256 => Questions) public questions;
     uint256 public totalQuestions = 0;
 
     constructor(address _polyToken) {
         owner = msg.sender;
         polyToken = _polyToken;
     }
+
+    mapping(uint256 => Questions) public questions;
 
     struct Questions {
         uint256 id;
@@ -132,7 +133,6 @@ contract Polymarket {
         payable
     {
         require(msg.sender == owner, "Unauthorized");
-        require(_questionId == 0, "Question ID cannot be empty");
 
         Questions storage question = questions[_questionId];
         if (eventOutcome) {

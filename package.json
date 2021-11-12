@@ -16,8 +16,6 @@
     "@types/canvasjs": "^1.9.7",
     "@types/plotly.js-dist-min": "^2.3.0",
     "autoprefixer": "^10.4.0",
-    "canvasjs": "^1.8.3",
-    "chart.js": "^3.6.0",
     "chartjs-adapter-moment": "^1.0.0",
     "ipfs-http-client": "^53.0.1",
     "moment": "^2.29.1",
@@ -28,8 +26,6 @@
     "react": "17.0.2",
     "react-chartjs-2": "^3.3.0",
     "react-dom": "17.0.2",
-    "react-google-charts": "^3.0.15",
-    "react-timeseries-charts": "^0.16.1",
     "tailwindcss": "^2.2.19",
     "web3": "^1.6.0"
   },

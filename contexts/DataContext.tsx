@@ -80,10 +80,6 @@ export const useProviderData = () => {
     }, 500);
   };
 
-  const updateImages = async () => {};
-
-  const tipImageOwner = async () => {};
-
   return {
     account,
     polymarket,

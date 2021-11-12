@@ -1,10 +1,118 @@
 import Head from "next/head";
-import React from "react";
+import React, { useCallback, useEffect, useState } from "react";
+import Web3 from "web3";
 import Navbar from "../components/Navbar";
 import { PortfolioMarketCard } from "../components/PortfolioMarketCard";
+import { useData } from "../contexts/DataContext";
 import styles from "../styles/Home.module.css";
 
-const portfolio = () => {
+export interface MarketProps {
+  id: string;
+  title?: string;
+  imageHash?: string;
+  totalAmount?: string;
+  totalYes?: string;
+  totalNo?: string;
+  userYes?: string;
+  hasResolved?: boolean;
+  userNo?: string;
+  timestamp?: string;
+  endTimestamp?: string;
+}
+
+export interface QuestionsProps {
+  id: string;
+  title?: string;
+  imageHash?: string;
+  totalAmount?: string;
+  totalYes?: string;
+  totalNo?: string;
+  hasResolved?: boolean;
+  endTimestamp?: string;
+}
+
+const Portfolio = () => {
+  const { polymarket, account, loadWeb3, loading } = useData();
+  const [markets, setMarkets] = useState<MarketProps[]>([]);
+  const [portfolioValue, setPortfolioValue] = useState<number>(0);
+  const [allQuestions, setAllQuestions] = useState<QuestionsProps[]>([]);
+  const [openPositions, setOpenPositions] = useState<number>(0);
+
+  const getMarkets = useCallback(async () => {
+    console.log("HERE");
+    var totalQuestions = await polymarket.methods
+      .totalQuestions()
+      .call({ from: account });
+    console.log("totalQuestions :>> ", totalQuestions);
+    for (var i = 0; i < totalQuestions; i++) {
+      var questions = await polymarket.methods
+        .questions(i)
+        .call({ from: account });
+      allQuestions.push({
+        id: questions.id,
+        title: questions.question,
+        imageHash: questions.creatorImageHash,
+        totalAmount: questions.totalAmount,
+        totalYes: questions.totalYesAmount,
+        totalNo: questions.totalNoAmount,
+        hasResolved: questions.eventCompleted,
+        endTimestamp: questions.endTimestamp,
+      });
+    }
+
+    var dataArray: MarketProps[] = [];
+    var totalPortValue = 0;
+    for (var i = 0; i < totalQuestions; i++) {
+      var data = await polymarket.methods
+        .getGraphData(i)
+        .call({ from: account });
+      data["0"].forEach((item: any) => {
+        if (item[0] == account) {
+          dataArray.push({
+            id: i.toString(),
+            userYes: item[1].toString(),
+            timestamp: item[2].toString(),
+          });
+          totalPortValue += parseInt(item[1]);
+          console.log("item[1] :>> ", item[1]);
+        }
+      });
+      data["1"].forEach((item: any) => {
+        if (item[0] == account) {
+          dataArray.push({
+            id: i.toString(),
+            userNo: item[1].toString(),
+            timestamp: item[2].toString(),
+          });
+          totalPortValue += parseInt(item[1]);
+          console.log("item[1] :>> ", item[1]);
+        }
+      });
+    }
+    setPortfolioValue(totalPortValue);
+    console.log("totalPortValue :>> ", totalPortValue);
+    for (var i = 0; i < dataArray.length; i++) {
+      var question = allQuestions.find((item) => item.id == dataArray[i].id);
+      dataArray[i].title = question!.title;
+      dataArray[i].imageHash = question!.imageHash;
+      dataArray[i].totalAmount = question!.totalAmount;
+      dataArray[i].totalYes = question!.totalYes;
+      dataArray[i].totalNo = question!.totalNo!;
+      dataArray[i].hasResolved = question!.hasResolved;
+      dataArray[i].endTimestamp = question!.endTimestamp;
+    }
+    setMarkets(dataArray);
+  }, [account, polymarket]);
+
+  useEffect(() => {
+    loadWeb3().then(() => {
+      if (!loading) {
+        console.log("Called :>> ");
+        getMarkets();
+      }
+    });
+  }, [loading]);
+
   return (
     <div className={styles.container}>
       <Head>
@@ -16,26 +124,34 @@ const portfolio = () => {
       <main className="w-full flex flex-col sm:flex-row flex-wrap sm:flex-nowrap py-4 flex-grow max-w-5xl">
         <div className="w-full flex flex-col pt-1">
           <div className="p-10 bg-blue-700 rounded-lg flex flex-row justify-evenly">
-            <div className="flex flex-col ">
-              <h1 className="text-white opacity-50 text-base">
-                Portfolio Value
+            <div className="flex flex-col items-center">
+              <h1 className="text-white opacity-50 text-lg">Portfolio Value</h1>
+              <h1 className="text-white text-4xl font-bold">
+                {Web3.utils.fromWei(portfolioValue.toString())} POLY
               </h1>
-              <h1 className="text-white text-2xl font-bold">$1,000,000</h1>
-            </div>
-            <div className="flex flex-col ">
-              <h1 className="text-white opacity-50 text-base">
-                Open Positions
-              </h1>
-              <h1 className="text-white text-2xl font-bold">$10,000</h1>
             </div>
           </div>
           <span className="font-bold my-3 text-lg">Your Market Positions</span>
-          <PortfolioMarketCard />
-          <PortfolioMarketCard />
+          {markets.map((market) => (
+            <PortfolioMarketCard
+              id={market.id}
+              title={market.title!}
+              imageHash={market.imageHash!}
+              totalAmount={market.totalAmount!}
+              totalYes={market.totalYes!}
+              totalNo={market.totalNo!}
+              userYes={market.userYes!}
+              userNo={market.userNo!}
+              key={market.id!}
+              hasResolved={market.hasResolved!}
+              timestamp={market.timestamp!}
+              endTimestamp={market.endTimestamp!}
+            />
+          ))}
         </div>
       </main>
     </div>
   );
 };
 
-export default portfolio;
+export default Portfolio;

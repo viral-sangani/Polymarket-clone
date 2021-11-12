@@ -20,9 +20,13 @@ export default function Home() {
   const [markets, setMarkets] = useState<MarketProps[]>([]);
 
   const getMarkets = useCallback(async () => {
+    console.log("HERE");
+    console.log("account :>> ", account);
+    console.log("polymarket :>> ", polymarket.methods);
     var totalQuestions = await polymarket.methods
       .totalQuestions()
       .call({ from: account });
+    console.log("totalQuestions :>> ", totalQuestions);
     var dataArray: MarketProps[] = [];
     for (var i = 0; i < totalQuestions; i++) {
       var data = await polymarket.methods.questions(i).call({ from: account });
@@ -105,14 +109,6 @@ export default function Home() {
                 />
               );
             })}
-
-            <div className="my-3 px-3 w-1/3 overflow-hidden">
-              {/* <!-- Column Content --> */}
-            </div>
-
-            <div className="my-3 px-3 w-1/3 overflow-hidden">
-              {/* <!-- Column Content --> */}
-            </div>
           </div>
         </div>
       </main>

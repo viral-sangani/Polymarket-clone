@@ -32,6 +32,7 @@ const Admin = () => {
 
   const handleSubmit = async () => {
     setLoading(true);
+    console.log("timestamp :>> ", timestamp);
     await polymarket.methods
       .createQuestion(title, imageHash, description, resolverUrl, timestamp)
       .send({
@@ -98,7 +99,7 @@ const Admin = () => {
             <input
               type="date"
               name="timestamp"
-              value={timestamp}
+              // value={timestamp}
               onChange={(e) => {
                 setTimestamp(e.target.valueAsDate?.getTime());
               }}
