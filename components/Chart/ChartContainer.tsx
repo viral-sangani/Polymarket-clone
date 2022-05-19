@@ -1,4 +1,3 @@
-import "chartjs-adapter-moment";
 import Plotly from "plotly.js-dist-min";
 import React, { useEffect } from "react";
 import Web3 from "web3";

@@ -173,10 +173,4 @@ contract Polymarket {
         if (msg.sender == owner) return true;
         else return false;
     }
-
-    function getBal() public view returns (uint256) {
-        return address(this).balance;
-    }
 }
-
-// "Will Modi win?", "abcd", "xyz", "https;//google.com"
